@@ -68,7 +68,7 @@ class FilesHandler extends \lang\Object {
    */
   #[@webmethod(verb= 'POST', accepts= 'multipart/form-data'), @$file: param('file')]
   public function uploadFile($file) {
-    if (null !== $this->base->findElement($file['name'])) {
+    if ($this->base->findElement($file['name'])) {
       throw new IllegalArgumentException('File "'.$file['name'].'"" already exists');
     }
 
@@ -91,7 +91,7 @@ class FilesHandler extends \lang\Object {
    */
   #[@webmethod(verb= 'DELETE', path= '/{name}')]
   public function removeFile($name) {
-    if (null === $this->base->findElement($name)) {
+    if (!$this->base->findElement($name)) {
       throw new ElementNotFoundException('File "'.$name.'"" does not exist');
     }
 
