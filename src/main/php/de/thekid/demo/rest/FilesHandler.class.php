@@ -94,7 +94,7 @@ class FilesHandler extends \lang\Object {
    * @param   webservices.rest.srv.Input $file
    * @return  void
    */
-  #[@webmethod(verb= 'PUT', path= '/{name}')]
+  #[@webmethod(verb= 'PUT', path= '/{name}', accepts= '*/*')]
   public function changeFile($name, StreamingInput $file) {
     if (!($element= $this->base->findElement($name))) {
       throw new IllegalArgumentException('File "'.$name.'" does not exist');
