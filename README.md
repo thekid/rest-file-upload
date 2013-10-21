@@ -18,12 +18,6 @@ $ curl -v localhost:8080/innovate-or-die.png > innovate-or-die.png
 $ curl -v -F "file=@enter.ini;type=text/plain" localhost:8080
 ```
 
-### Edit the uploaded file
-
-```sh
-$ curl -v -XPUT --data-binary @enter.ini -H 'Content-Type: text/plain' localhost:8080/enter.ini
-```
-
 ### Delete the file
 
 ```sh
