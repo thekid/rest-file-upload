@@ -13,6 +13,7 @@ use util\NoSuchElementException;
 use lang\ElementNotFoundException;
 use lang\IllegalArgumentException;
 use webservices\rest\srv\StreamingOutput;
+use webservices\rest\srv\StreamingInput;
 use webservices\rest\srv\Uploads;
 use webservices\rest\srv\Response;
 
@@ -85,6 +86,29 @@ class FilesHandler extends \lang\Object {
 
     return Response::created($this->getClass()->getAnnotation('webservice', 'path').$file->getName());
   }
+
+  /**
+   * Upload a single file
+   *
+   * @param   string $name
+   * @param   webservices.rest.srv.Input $file
+   * @return  void
+   */
+  #[@webmethod(verb= 'PUT', path= '/{name}')]
+  public function changeFile($name, StreamingInput $file) {
+    if (!($element= $this->base->findElement($name))) {
+      throw new IllegalArgumentException('File "'.$name.'" does not exist');
+    }
+
+    // Transfer
+    $t= new StreamTransfer(
+      $file->getInputStream(),
+      $this->base->newElement($name)->getOutputStream()
+    );
+    $t->transferAll();
+    $t->close();
+  }
+
 
   /**
    * Delete a file
