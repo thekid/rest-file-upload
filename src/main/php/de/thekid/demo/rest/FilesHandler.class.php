@@ -5,12 +5,15 @@ use io\collections\IOCollection;
 use io\collections\iterate\FilteredIOCollectionIterator;
 use io\collections\iterate\CollectionFilter;
 use io\collections\iterate\NegationOfFilter;
+use io\streams\StreamTransfer;
 use io\File;
 use util\Properties;
 use util\MimeType;
 use util\NoSuchElementException;
 use lang\ElementNotFoundException;
+use lang\IllegalArgumentException;
 use webservices\rest\srv\StreamingOutput;
+use webservices\rest\srv\Response;
 
 #[@webservice(path= '/')]
 class FilesHandler extends \lang\Object {
@@ -44,7 +47,7 @@ class FilesHandler extends \lang\Object {
   }
 
   /**
-   * Get a single file
+   * Download a single file
    *
    * @param   string $name
    * @return  webservices.rest.srv.StreamingOutput
@@ -56,5 +59,27 @@ class FilesHandler extends \lang\Object {
     } catch (NoSuchElementException $e) {
       throw new ElementNotFoundException('No file called "'.$name.'"');
     }
+  }
+
+  /**
+   * Upload a single file
+   *
+   * @return  webservices.rest.srv.StreamingOutput
+   */
+  #[@webmethod(verb= 'POST', accepts= 'multipart/form-data'), @$file: param('file')]
+  public function uploadFile($file) {
+    if (null !== $this->base->findElement($file['name'])) {
+      throw new IllegalArgumentException('File "'.$file['name'].'"" already exists');
+    }
+
+    // Copy /tmp-File
+    $t= new StreamTransfer(
+      create(new File($file['tmp_name']))->getInputStream(),
+      $this->base->newElement($file['name'])->getOutputStream()
+    );
+    $t->transferAll();
+    $t->close();
+
+    return Response::created($this->getClass()->getAnnotation('webservice', 'path').$file['name']);
   }
 }
