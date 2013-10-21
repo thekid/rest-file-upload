@@ -13,6 +13,7 @@ use util\NoSuchElementException;
 use lang\ElementNotFoundException;
 use lang\IllegalArgumentException;
 use webservices\rest\srv\StreamingOutput;
+use webservices\rest\srv\Uploads;
 use webservices\rest\srv\Response;
 
 #[@webservice(path= '/')]
@@ -64,23 +65,25 @@ class FilesHandler extends \lang\Object {
   /**
    * Upload a single file
    *
+   * @param   webservices.rest.srv.Input
    * @return  webservices.rest.srv.Output
    */
-  #[@webmethod(verb= 'POST', accepts= 'multipart/form-data'), @$file: param('file')]
-  public function newFile($file) {
-    if ($this->base->findElement($file['name'])) {
-      throw new IllegalArgumentException('File "'.$file['name'].'"" already exists');
+  #[@webmethod(verb= 'POST', accepts= 'multipart/form-data')]
+  public function newFile(Uploads $uploads) {
+    $file= $uploads->eachNamed('file')[0];
+    if ($this->base->findElement($file->getName())) {
+      throw new IllegalArgumentException('File "'.$file->getName().'"" already exists');
     }
 
     // Copy /tmp-File
     $t= new StreamTransfer(
-      create(new File($file['tmp_name']))->getInputStream(),
-      $this->base->newElement($file['name'])->getOutputStream()
+      $file->getInputStream(),
+      $this->base->newElement($file->getName())->getOutputStream()
     );
     $t->transferAll();
     $t->close();
 
-    return Response::created($this->getClass()->getAnnotation('webservice', 'path').$file['name']);
+    return Response::created($this->getClass()->getAnnotation('webservice', 'path').$file->getName());
   }
 
   /**
