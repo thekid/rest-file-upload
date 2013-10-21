@@ -50,7 +50,7 @@ class FilesHandler extends \lang\Object {
    * Download a single file
    *
    * @param   string $name
-   * @return  webservices.rest.srv.StreamingOutput
+   * @return  webservices.rest.srv.Output
    */
   #[@webmethod(verb= 'GET', path= '/{name}')]
   public function getFile($name) {
@@ -64,7 +64,7 @@ class FilesHandler extends \lang\Object {
   /**
    * Upload a single file
    *
-   * @return  webservices.rest.srv.Response
+   * @return  webservices.rest.srv.Output
    */
   #[@webmethod(verb= 'POST', accepts= 'multipart/form-data'), @$file: param('file')]
   public function newFile($file) {
@@ -87,7 +87,7 @@ class FilesHandler extends \lang\Object {
    * Delete a file
    *
    * @param   string $name
-   * @return  webservices.rest.srv.Response
+   * @return  void
    */
   #[@webmethod(verb= 'DELETE', path= '/{name}')]
   public function removeFile($name) {
@@ -96,6 +96,5 @@ class FilesHandler extends \lang\Object {
     }
 
     $this->base->removeElement($name);
-    return Response::noContent();
   }
 }
