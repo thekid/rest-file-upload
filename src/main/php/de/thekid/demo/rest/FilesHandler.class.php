@@ -67,7 +67,7 @@ class FilesHandler extends \lang\Object {
    * @return  webservices.rest.srv.Response
    */
   #[@webmethod(verb= 'POST', accepts= 'multipart/form-data'), @$file: param('file')]
-  public function uploadFile($file) {
+  public function newFile($file) {
     if ($this->base->findElement($file['name'])) {
       throw new IllegalArgumentException('File "'.$file['name'].'"" already exists');
     }
