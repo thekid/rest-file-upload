@@ -64,7 +64,7 @@ class FilesHandler extends \lang\Object {
   /**
    * Upload a single file
    *
-   * @return  webservices.rest.srv.StreamingOutput
+   * @return  webservices.rest.srv.Response
    */
   #[@webmethod(verb= 'POST', accepts= 'multipart/form-data'), @$file: param('file')]
   public function uploadFile($file) {
@@ -81,5 +81,21 @@ class FilesHandler extends \lang\Object {
     $t->close();
 
     return Response::created($this->getClass()->getAnnotation('webservice', 'path').$file['name']);
+  }
+
+  /**
+   * Delete a file
+   *
+   * @param   string $name
+   * @return  webservices.rest.srv.Response
+   */
+  #[@webmethod(verb= 'DELETE', path= '/{name}')]
+  public function removeFile($name) {
+    if (null === $this->base->findElement($name)) {
+      throw new ElementNotFoundException('File "'.$name.'"" does not exist');
+    }
+
+    $this->base->removeElement($name);
+    return Response::noContent();
   }
 }
